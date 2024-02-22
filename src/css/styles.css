@@ -26,15 +26,32 @@
   font-weight: 600;
 }
 
-input {
-  width: 280px;
-  height: 20px;
-  margin-right: 8px;
-}
-
 button {
   padding-top: 4px;
   padding-bottom: 4px;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+/* Стилі для Промісу
+ */
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 260px;
+}
+label [type='number'] {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+label[type='radio'] {
+  display: block;
+  margin: auto;
+}
+button[type='submit'] {
+  margin-top: 8px;
+  padding: 4px 60px;
 }
