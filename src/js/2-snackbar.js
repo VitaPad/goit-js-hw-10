@@ -18,10 +18,9 @@ function createPromise(state, delay) {
 
 function createButton(event) {
   event.preventDefault();
- /*  event.target.name = event.target.value |? */
-    /*   const delay = formEl.querySelector('input[name="delay"]').value;
-  const state = formEl.querySelector('input[name="state"]:checked').value; */
-    .createPromise(state, delay)
+  const delay = formEl.querySelector('input[name="delay"]').value;
+  const state = formEl.querySelector('input[name="state"]:checked').value;
+  createPromise(state, delay)
     .then(delay => {
       iziToast.success({
         title: ``,
