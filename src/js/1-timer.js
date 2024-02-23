@@ -1,50 +1,78 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-const startBtn = document.querySelector('button');
-const textEl = document.querySelector('input');
-const timerEl = document.querySelector('.timer');
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
+const startBtn = document.querySelector('button');
+const textEl = document.getElementById('datetime-picker');
+const timerEl = document.querySelector('.timer');
+const timerDaysEl = document.querySelector('[data-days]');
+const timerHoursEl = document.querySelector('[data-hours]');
+const timerMinutesEl = document.querySelector('[data-minutes]');
+const timerSecondsEl = document.querySelector('[data-seconds]');
+
+let userSelectedDate;
+let intervalId;
 startBtn.addEventListener('click', handleStartButtonClick);
 
 function handleStartButtonClick() {
   const options = {
-    enableTime: true /*  Вмикає засіб вибору часу */,
-    time_24hr: true /* Відображає засіб вибору часу в 24-годинному режимі без вибору AM/PM, якщо ввімкнено. */,
-    defaultDate: new Date() /* Встановлює початкові вибрані дати. */,
-    minuteIncrement: 1 /* Регулює крок для введення хвилин (включно з прокручуванням) */,
+    enableTime: true,
+    time_24hr: true,
+    defaultDate: new Date(),
+    minuteIncrement: 1,
     onClose(selectedDates) {
-      let userSelectedDate = selectedDates[0];
+      userSelectedDate = selectedDates[0];
       if (userSelectedDate > new Date()) {
         startBtn.disabled = true;
       } else {
-        window.alert('Please choose a date in the future');
         startBtn.disabled = false;
+        iziToast.error({
+          title: 'Error',
+          message: 'Please choose a date in the future',
+        });
       }
-    } /* запускається, коли відкривається календар. */,
+    },
   };
 
   flatpickr(textEl, options);
+  const selectedDates = flatpickr.parseDate(textEl.value);
+  if (selectedDates) {
+    userSelectedDate = selectedDates;
+    handleTimer();
+    intervalId = setInterval(handleTimer, 1000);
+  }
+}
+
+function handleTimer() {
+  const currentTime = new Date();
+  const difference = userSelectedDate.getTime() - currentTime.getTime();
+  const { days, hours, minutes, seconds } = convertMs(difference);
+
+  timerDaysEl.textContent = formatTimeValue(days);
+  timerHoursEl.textContent = formatTimeValue(hours);
+  timerMinutesEl.textContent = formatTimeValue(minutes);
+  timerSecondsEl.textContent = formatTimeValue(seconds);
 }
 
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
 
-  // Remaining days
   const days = Math.floor(ms / day);
-  // Remaining hours
   const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
   const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
 }
 
-console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
+function formatTimeValue(value) {
+  return `${value}`;
+}
+
+if (userSelectedDate) {
+  intervalId = setInterval(handleTimer, 1000);
+}
